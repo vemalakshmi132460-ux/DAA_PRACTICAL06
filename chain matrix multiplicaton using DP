@@ -1,0 +1,63 @@
+#include <iostream>
+#include <vector>
+#include <climits>
+using namespace std;
+
+void printOptimalParenthesis(vector<vector<int>>& split, int i, int j) {
+    if (i == j) {
+        cout << "A" << i;
+        return;
+    }
+
+    cout << "(";
+
+    printOptimalParenthesis(split, i, split[i][j]);
+    printOptimalParenthesis(split, split[i][j] + 1, j);
+
+    cout << ")";
+}
+
+int matrixChainMultiplication(vector<int>& p, int n) {
+    vector<vector<int>> dp(n, vector<int>(n, 0));
+    vector<vector<int>> split(n, vector<int>(n, 0));
+    for (int length = 2; length <= n - 1; length++) {
+
+        for (int i = 1; i <= n - length; i++) {
+
+            int j = i + length - 1;
+
+            dp[i][j] = INT_MAX;
+            for (int k = i; k < j; k++) {
+
+                int cost = dp[i][k]
+                         + dp[k + 1][j]
+                         + p[i - 1] * p[k] * p[j];
+
+                if (cost < dp[i][j]) {
+                    dp[i][j] = cost;
+                    split[i][j] = k;
+                }
+            }
+        }
+    }
+
+    cout << "Minimum number of scalar multiplications = "
+         << dp[1][n - 1] << endl;
+
+    cout << "Optimal Parenthesization = ";
+    printOptimalParenthesis(split, 1, n - 1);
+    cout << endl;
+
+    return dp[1][n - 1];
+}
+
+int main() {
+
+    vector<int> p = {10, 20, 30, 40, 30};
+
+    int n = p.size();
+
+    matrixChainMultiplication(p, n);
+
+    return 0;
+}
